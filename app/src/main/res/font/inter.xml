@@ -1,0 +1,11 @@
+<!-- res/font/inter.xml -->
+<font-family xmlns:app="http://schemas.android.com/apk/res-auto">
+    <font
+        app:font="@font/inter_reguler"
+        app:fontStyle="normal"
+        app:fontWeight="400" />
+    <font
+        app:font="@font/inter_bold"
+        app:fontStyle="normal"
+        app:fontWeight="700" />
+</font-family>
