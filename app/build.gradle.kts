@@ -43,6 +43,8 @@ dependencies {
     implementation("com.google.firebase:firebase-database-ktx")
     implementation ("androidx.activity:activity-ktx:1.7.0")
     implementation ("com.github.bumptech.glide:glide:4.12.0")
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.storage)
     annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
 
     implementation ("androidx.camera:camera-core:1.2.3")

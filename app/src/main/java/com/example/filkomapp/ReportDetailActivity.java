@@ -4,9 +4,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageButton;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,19 +23,20 @@ public class ReportDetailActivity extends AppCompatActivity {
 
     private ImageView reportImage;
     private TextView titleText, locationText, descriptionText, statusText, likesText;
-    private ImageButton statusButton1, statusButton2, statusButton3, statusButton4;
+    private Spinner statusSpinner;
+    private LinearLayout likeLayout, statusContainer;
+
     private FirebaseHelper firebaseHelper;
     private String reportId;
     private boolean isAdmin = false;
     private FirebaseUser currentUser;
-    private LinearLayout likeLayout;
+    private boolean isSpinnerInitialized = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_laporan);
 
-        // Inisialisasi view
         reportImage = findViewById(R.id.imageView);
         titleText = findViewById(R.id.title);
         locationText = findViewById(R.id.place);
@@ -42,38 +44,18 @@ public class ReportDetailActivity extends AppCompatActivity {
         statusText = findViewById(R.id.statusText);
         likesText = findViewById(R.id.likes);
         likeLayout = findViewById(R.id.like);
-
-        statusButton1 = findViewById(R.id.statusButton1);
-        statusButton2 = findViewById(R.id.statusButton2);
-        statusButton3 = findViewById(R.id.statusButton3);
-        statusButton4 = findViewById(R.id.statusButton4);
+        statusSpinner = findViewById(R.id.statusSpinner);
+        statusContainer = findViewById(R.id.statusContainer); // Tambahan untuk kontrol layout status
 
         firebaseHelper = new FirebaseHelper(this);
         currentUser = firebaseHelper.getAuth().getCurrentUser();
-
         reportId = getIntent().getStringExtra("reportId");
+
         if (reportId == null) {
             finish();
             return;
         }
 
-        // Cek admin
-        if (currentUser != null) {
-            firebaseHelper.checkAdminStatus(currentUser.getUid(), new FirebaseHelper.AdminCheckCallback() {
-                @Override
-                public void onAdminChecked(boolean admin) {
-                    isAdmin = admin;
-                    setupStatusButtons();
-                }
-
-                @Override
-                public void onFailure(String errorMessage) {
-                    Toast.makeText(ReportDetailActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-
-        // Load data laporan
         firebaseHelper.getDatabase().child("reports").child(reportId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -84,7 +66,17 @@ public class ReportDetailActivity extends AppCompatActivity {
                             locationText.setText(report.getLocation());
                             descriptionText.setText(report.getDescription());
                             statusText.setText(report.getStatus());
+                            setStatusBackground(report.getStatus());
+
                             likesText.setText(String.valueOf(report.getLikes()));
+
+                            String[] statuses = getResources().getStringArray(R.array.status_options);
+                            for (int i = 0; i < statuses.length; i++) {
+                                if (statuses[i].equalsIgnoreCase(report.getStatus())) {
+                                    statusSpinner.setSelection(i);
+                                    break;
+                                }
+                            }
 
                             if (report.getImage() != null && !report.getImage().isEmpty()) {
                                 Bitmap bitmap = FirebaseHelper.base64ToBitmap(report.getImage());
@@ -99,7 +91,39 @@ public class ReportDetailActivity extends AppCompatActivity {
                     }
                 });
 
-        // Tombol Like
+        if (currentUser != null) {
+            firebaseHelper.checkAdminStatus(currentUser.getUid(), new FirebaseHelper.AdminCheckCallback() {
+                @Override
+                public void onAdminChecked(boolean admin) {
+                    isAdmin = admin;
+                    statusContainer.setVisibility(admin ? View.VISIBLE : View.GONE);
+                }
+
+                @Override
+                public void onFailure(String errorMessage) {
+                    Toast.makeText(ReportDetailActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            statusContainer.setVisibility(View.GONE);
+        }
+
+        statusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                if (!isSpinnerInitialized) {
+                    isSpinnerInitialized = true;
+                    return;
+                }
+
+                String selectedStatus = adapterView.getItemAtPosition(position).toString();
+                updateStatus(selectedStatus);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        });
+
         likeLayout.setOnClickListener(v -> {
             if (currentUser != null) {
                 firebaseHelper.toggleLikeReport(reportId, currentUser.getUid(), new FirebaseHelper.LikeCallback() {
@@ -130,7 +154,6 @@ public class ReportDetailActivity extends AppCompatActivity {
             }
         });
 
-        // Navigasi tombol
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
         findViewById(R.id.btnHome).setOnClickListener(v -> {
             startActivity(new Intent(ReportDetailActivity.this, DashboardActivity.class));
@@ -146,30 +169,12 @@ public class ReportDetailActivity extends AppCompatActivity {
         });
     }
 
-    private void setupStatusButtons() {
-        if (isAdmin) {
-            statusButton1.setVisibility(View.VISIBLE);
-            statusButton2.setVisibility(View.VISIBLE);
-            statusButton3.setVisibility(View.VISIBLE);
-            statusButton4.setVisibility(View.VISIBLE);
-
-            statusButton1.setOnClickListener(v -> updateStatus("New"));
-            statusButton2.setOnClickListener(v -> updateStatus("Processing"));
-            statusButton3.setOnClickListener(v -> updateStatus("Fixed"));
-            statusButton4.setOnClickListener(v -> updateStatus("Unfixable"));
-        } else {
-            statusButton1.setVisibility(View.GONE);
-            statusButton2.setVisibility(View.GONE);
-            statusButton3.setVisibility(View.GONE);
-            statusButton4.setVisibility(View.GONE);
-        }
-    }
-
     private void updateStatus(String status) {
         firebaseHelper.updateReportStatus(reportId, status, new FirebaseHelper.StatusCallback() {
             @Override
             public void onSuccess() {
                 statusText.setText(status);
+                setStatusBackground(status);
                 Toast.makeText(ReportDetailActivity.this, "Status diperbarui", Toast.LENGTH_SHORT).show();
                 createStatusChangeNotification(status);
             }
@@ -198,5 +203,27 @@ public class ReportDetailActivity extends AppCompatActivity {
         );
 
         firebaseHelper.getDatabase().child("notifications").child(notificationId).setValue(notification);
+    }
+
+    private void setStatusBackground(String status) {
+        if (status == null) return;
+
+        switch (status.toLowerCase()) {
+            case "new":
+                statusText.setBackgroundResource(R.drawable.bg_status_new);
+                break;
+            case "processing":
+                statusText.setBackgroundResource(R.drawable.bg_status_processing);
+                break;
+            case "fixed":
+                statusText.setBackgroundResource(R.drawable.bg_status_fixed);
+                break;
+            case "unfixable":
+                statusText.setBackgroundResource(R.drawable.bg_status_unfixable);
+                break;
+            default:
+                statusText.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+                break;
+        }
     }
 }

@@ -1,9 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".Laporan">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bg_top"
@@ -113,162 +115,130 @@
 
                     <LinearLayout
                         android:id="@+id/like"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="4dp"
-                    android:background="@drawable/card_likes"
-                    android:gravity="center_vertical">
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp"
+                        android:background="@drawable/card_likes"
+                        android:gravity="center_vertical">
 
-                    <TextView
-                        android:id="@+id/likes"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="90"
-                    android:textStyle="bold"
-                    android:textSize="12sp"
-                    android:textColor="#5A3825"
-                    android:layout_marginEnd="4dp" />
+                        <TextView
+                            android:id="@+id/likes"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="90"
+                            android:textStyle="bold"
+                            android:textSize="12sp"
+                            android:textColor="#5A3825"
+                            android:layout_marginEnd="4dp" />
 
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/ic_like" />
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_like" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
+
+            <View
+                android:layout_width="350dp"
+                android:layout_height="2dp"
+                android:layout_marginTop="16dp"
+                android:background="#A0A0A0"
+                android:layout_gravity="center_horizontal" />
+
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tembok di belakang gedung A terlihat kurang terawat..."
+                android:textSize="16sp"
+                android:justificationMode="inter_word"
+                android:paddingTop="16dp" />
+
+            <!-- Spinner Status Dropdown -->
+            <LinearLayout
+                android:id="@+id/statusContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="16dp"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/statusLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Status:"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:layout_marginBottom="4dp" />
+
+                <Spinner
+                    android:id="@+id/statusSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:spinnerMode="dropdown"
+                    android:background="@drawable/news_status"
+                    android:padding="8dp"
+                    android:popupBackground="#FFFFFF"
+                    android:dropDownVerticalOffset="10dp"
+                    android:entries="@array/status_options" />
+            </LinearLayout>
+
         </LinearLayout>
+    </ScrollView>
 
-        <View
-            android:layout_width="350dp"
-            android:layout_height="2dp"
-            android:layout_marginTop="16dp"
-            android:background="#A0A0A0"
-            android:layout_gravity="center_horizontal" />
-
-        <TextView
-            android:id="@+id/description"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bottomNav"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Tembok di belakang gedung A terlihat kurang terawat..."
-        android:textSize="16sp"
-        android:justificationMode="inter_word"
-        android:paddingTop="16dp" />
+        android:layout_height="80dp"
+        android:background="#0272BA"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Tombol status -->
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
-            <ImageButton
-                android:id="@+id/statusButton1"
-                android:layout_width="153dp"
-                android:layout_height="30dp"
-                android:background="@drawable/news_status" />
-            <TextView
-                android:layout_width="153dp"
-                android:layout_height="30dp"
-                android:text="New"
-                android:gravity="center_vertical" />
-        </FrameLayout>
+        <ImageButton
+            android:id="@+id/btnHome"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="32dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/home"
+            android:contentDescription="Home"
+            app:tint="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <ImageButton
-                android:id="@+id/statusButton2"
-                android:layout_width="153dp"
-                android:layout_height="30dp"
-                android:background="@drawable/news_status" />
-            <TextView
-                android:layout_width="153dp"
-                android:layout_height="30dp"
-                android:text="Processing"
-                android:gravity="center_vertical" />
-        </FrameLayout>
+        <ImageButton
+            android:id="@+id/btnProfile"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="32dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/nav_profile"
+            android:contentDescription="Profile"
+            app:tint="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <ImageButton
-                android:id="@+id/statusButton3"
-                android:layout_width="153dp"
-                android:layout_height="30dp"
-                android:background="@drawable/news_status" />
-            <TextView
-                android:layout_width="153dp"
-                android:layout_height="30dp"
-                android:text="Fixed"
-                android:gravity="center_vertical" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <ImageButton
-                android:id="@+id/statusButton4"
-                android:layout_width="153dp"
-                android:layout_height="30dp"
-                android:background="@drawable/news_status" />
-            <TextView
-                android:layout_width="153dp"
-                android:layout_height="30dp"
-                android:text="Unfixable"
-                android:gravity="center_vertical" />
-        </FrameLayout>
-
-    </LinearLayout>
-</ScrollView>
-
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:id="@+id/bottomNav"
-    android:layout_width="match_parent"
-    android:layout_height="80dp"
-    android:background="#0272BA"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent">
-
-<ImageButton
-    android:id="@+id/btnHome"
-    android:layout_width="48dp"
-    android:layout_height="48dp"
-    android:layout_marginStart="32dp"
-    android:background="@android:color/transparent"
-    android:src="@drawable/home"
-    android:contentDescription="Home"
-    app:tint="@android:color/white"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
-
-<ImageButton
-    android:id="@+id/btnProfile"
-    android:layout_width="48dp"
-    android:layout_height="48dp"
-    android:layout_marginEnd="32dp"
-    android:background="@android:color/transparent"
-    android:src="@drawable/nav_profile"
-    android:contentDescription="Profile"
-    app:tint="@android:color/white"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
-
-<ImageButton
-    android:id="@+id/btnKirim"
-    android:layout_width="100dp"
-    android:layout_height="100dp"
-    android:background="@drawable/fab_blue"
-    android:src="@drawable/upload_icon"
-    android:contentDescription="Kirim"
-    android:layout_marginBottom="28dp"
-    app:tint="@android:color/white"
-    android:scaleType="center"
-    android:elevation="10dp"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent" />
+    <ImageButton
+        android:id="@+id/btnKirim"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="@drawable/fab_blue"
+        android:src="@drawable/upload_icon"
+        android:contentDescription="Kirim"
+        android:layout_marginBottom="28dp"
+        app:tint="@android:color/white"
+        android:scaleType="center"
+        android:elevation="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

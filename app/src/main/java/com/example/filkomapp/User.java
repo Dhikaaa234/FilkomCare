@@ -9,8 +9,9 @@ public class User {
     private String nim;
     private String programStudi;
     private boolean isAdmin;
+    private String profileUrl;
 
-    // Constructors, getters, and setters
+
     public User() {}
 
     public User(String name, String email, boolean isAdmin) {
@@ -19,11 +20,14 @@ public class User {
         this.isAdmin = isAdmin;
     }
 
-    // Getters and setters for all fields
+
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+    public String
+    getProfileUrl() { return profileUrl; }
+    public void setProfileUrl(String profileUrl) { this.profileUrl = profileUrl; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
     public String getNim() { return nim; }

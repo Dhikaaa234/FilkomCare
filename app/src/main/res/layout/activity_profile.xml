@@ -121,13 +121,17 @@
                         android:textColor="@android:color/white"
                         android:textStyle="bold" />
 
-                    <TextView
+                    <EditText
                         android:id="@+id/nim"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="235150701111018"
+                        android:hint="Masukkan NIM"
                         android:textColor="@android:color/white"
+                        android:textColorHint="#80FFFFFF"
+                        android:background="@android:color/transparent"
+                        android:inputType="number"
                         android:textSize="12dp" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -145,13 +149,17 @@
                         android:textColor="@android:color/white"
                         android:textStyle="bold" />
 
-                    <TextView
+                    <EditText
                         android:id="@+id/prodi"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="TEKNOLOGI INFORMASI"
+                        android:hint="Masukkan Prodi"
                         android:textColor="@android:color/white"
+                        android:textColorHint="#80FFFFFF"
+                        android:background="@android:color/transparent"
+                        android:inputType="textCapWords"
                         android:textSize="12dp" />
+
                 </LinearLayout>
             </LinearLayout>
 

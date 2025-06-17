@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
 
+
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.Task;
@@ -303,4 +305,30 @@ public class FirebaseHelper {
         void onAdminChecked(boolean isAdmin);
         void onFailure(String errorMessage);
     }
+    public void saveUserData(User user) {
+        if (user != null && user.getId() != null) {
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("name", user.getName());
+            updates.put("email", user.getEmail());
+            updates.put("isAdmin", user.isAdmin());
+            updates.put("nim", user.getNim());
+            updates.put("programStudi", user.getProgramStudi());
+
+            mDatabase.child("users").child(user.getId()).updateChildren(updates);
+        }
+    }
+
+    public void saveProfileImageUrl(String uid, String url) {
+        if (uid == null || url == null) {
+            Toast.makeText(context, "UID atau URL kosong", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        mDatabase.child("users").child(uid).child("profileUrl").setValue(url)
+                .addOnSuccessListener(aVoid -> Toast.makeText(context, "URL foto profil berhasil disimpan", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(context, "Gagal simpan URL foto: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
+
+
+
 }
