@@ -12,23 +12,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.loading_page);
 
-        // Simulasi proses loading selama 2 detik
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 FirebaseHelper firebaseHelper = new FirebaseHelper(MainActivity.this);
 
-                // ✅ Gunakan method getCurrentUser() (bukan akses langsung mAuth)
+
                 if (firebaseHelper.getCurrentUser() != null) {
-                    // Jika sudah login, masuk ke dashboard
+
                     startActivity(new Intent(MainActivity.this, DashboardActivity.class));
                 } else {
-                    // Jika belum login, masuk ke sign-in
+
                     startActivity(new Intent(MainActivity.this, SignInActivity.class));
                 }
 
-                finish(); // Tutup activity loading
+                finish();
             }
-        }, 2000); // delay 2 detik
+        }, 2000);
     }
 }

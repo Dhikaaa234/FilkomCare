@@ -45,7 +45,7 @@
             app:layout_constraintVertical_bias="0.2" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Profile Icon -->
+
     <ImageView
         android:id="@+id/profileIcon"
         android:layout_width="100dp"
@@ -60,7 +60,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Scrollable Content -->
+
     <ScrollView
         android:id="@+id/scroll_content"
         android:layout_width="0dp"
@@ -95,7 +95,7 @@
                 android:textStyle="bold"
                 android:layout_marginTop="4dp" />
 
-            <!-- NIM & PRODI -->
+
             <LinearLayout
                 android:id="@+id/infoNimProdi"
                 android:layout_width="344dp"
@@ -163,7 +163,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Logout Button -->
+
             <FrameLayout
                 android:layout_width="120dp"
                 android:layout_height="48dp"
@@ -189,8 +189,9 @@
                     android:textStyle="bold" />
             </FrameLayout>
 
-            <!-- Riwayat -->
+
             <TextView
+                android:id="@+id/historyTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="25dp"
@@ -201,15 +202,36 @@
                 android:textStyle="bold"
                 android:gravity="start" />
 
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewNews"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="16dp" />
+            <TextView
+                android:id="@+id/fixedHistoryTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:layout_marginStart="25dp"
+                android:layout_marginEnd="16dp"
+                android:text="RIWAYAT AUDIT"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:gravity="start"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/fixedReportsRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:visibility="gone" />
+
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom Navigation -->
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
@@ -246,7 +268,7 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Floating Upload Button -->
+
     <ImageButton
         android:id="@+id/btnKirim"
         android:layout_width="100dp"

@@ -1,5 +1,6 @@
 package com.example.filkomapp;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseUser;
@@ -45,7 +47,7 @@ public class ReportDetailActivity extends AppCompatActivity {
         likesText = findViewById(R.id.likes);
         likeLayout = findViewById(R.id.like);
         statusSpinner = findViewById(R.id.statusSpinner);
-        statusContainer = findViewById(R.id.statusContainer); // Tambahan untuk kontrol layout status
+        statusContainer = findViewById(R.id.statusContainer);
 
         firebaseHelper = new FirebaseHelper(this);
         currentUser = firebaseHelper.getAuth().getCurrentUser();
@@ -67,7 +69,6 @@ public class ReportDetailActivity extends AppCompatActivity {
                             descriptionText.setText(report.getDescription());
                             statusText.setText(report.getStatus());
                             setStatusBackground(report.getStatus());
-
                             likesText.setText(String.valueOf(report.getLikes()));
 
                             String[] statuses = getResources().getStringArray(R.array.status_options);
@@ -76,6 +77,11 @@ public class ReportDetailActivity extends AppCompatActivity {
                                     statusSpinner.setSelection(i);
                                     break;
                                 }
+                            }
+
+                            // Disable spinner jika status sudah fixed
+                            if (report.getStatus().equalsIgnoreCase("fixed")) {
+                                statusSpinner.setEnabled(false);
                             }
 
                             if (report.getImage() != null && !report.getImage().isEmpty()) {
@@ -117,7 +123,22 @@ public class ReportDetailActivity extends AppCompatActivity {
                 }
 
                 String selectedStatus = adapterView.getItemAtPosition(position).toString();
-                updateStatus(selectedStatus);
+
+                // Jika admin memilih "Fixed", konfirmasi dulu
+                if (selectedStatus.equalsIgnoreCase("fixed")) {
+                    new AlertDialog.Builder(ReportDetailActivity.this)
+                            .setTitle("Konfirmasi Status")
+                            .setMessage("Setelah status diubah menjadi 'Fixed', status tidak bisa diubah lagi. Lanjutkan?")
+                            .setPositiveButton("Ya", (dialog, which) -> updateStatus(selectedStatus))
+                            .setNegativeButton("Batal", (dialog, which) -> {
+                                // Kembalikan ke pilihan sebelumnya (supaya tidak langsung berubah)
+                                statusSpinner.setSelection(getSpinnerIndexByStatus(statusText.getText().toString()));
+                            })
+                            .setCancelable(false)
+                            .show();
+                } else {
+                    updateStatus(selectedStatus);
+                }
             }
 
             @Override
@@ -177,6 +198,10 @@ public class ReportDetailActivity extends AppCompatActivity {
                 setStatusBackground(status);
                 Toast.makeText(ReportDetailActivity.this, "Status diperbarui", Toast.LENGTH_SHORT).show();
                 createStatusChangeNotification(status);
+
+                if (status.equalsIgnoreCase("fixed")) {
+                    statusSpinner.setEnabled(false);
+                }
             }
 
             @Override
@@ -184,6 +209,16 @@ public class ReportDetailActivity extends AppCompatActivity {
                 Toast.makeText(ReportDetailActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private int getSpinnerIndexByStatus(String status) {
+        String[] statuses = getResources().getStringArray(R.array.status_options);
+        for (int i = 0; i < statuses.length; i++) {
+            if (statuses[i].equalsIgnoreCase(status)) {
+                return i;
+            }
+        }
+        return 0;
     }
 
     private void createStatusChangeNotification(String newStatus) {

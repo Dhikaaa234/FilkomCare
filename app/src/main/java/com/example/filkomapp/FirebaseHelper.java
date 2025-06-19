@@ -4,27 +4,18 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
-
-
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ServerValue;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.*;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FirebaseHelper {
     private FirebaseAuth mAuth;
@@ -37,7 +28,6 @@ public class FirebaseHelper {
         mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
-    // ✅ Tambahan yang diperlukan
     public DatabaseReference getDatabase() {
         return mDatabase;
     }
@@ -88,7 +78,6 @@ public class FirebaseHelper {
                             userMap.put("name", name);
                             userMap.put("email", email);
                             userMap.put("isAdmin", false);
-
                             mDatabase.child("users").child(user.getUid()).setValue(userMap)
                                     .addOnCompleteListener(task1 -> {
                                         if (task1.isSuccessful()) {
@@ -197,14 +186,36 @@ public class FirebaseHelper {
     }
 
     public void updateReportStatus(String reportId, String status, final StatusCallback callback) {
-        mDatabase.child("reports").child(reportId).child("status").setValue(status)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        callback.onSuccess();
-                    } else {
-                        callback.onFailure(task.getException().getMessage());
+        DatabaseReference reportRef = mDatabase.child("reports").child(reportId);
+
+        reportRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Map<String, Object> updates = new HashMap<>();
+                updates.put("status", status);
+
+                if ("fixed".equalsIgnoreCase(status)) {
+                    String currentUid = getCurrentUserId();
+                    if (snapshot.child("fixedBy").getValue() == null) {
+                        updates.put("fixedBy", currentUid);
                     }
-                });
+                }
+
+                reportRef.updateChildren(updates)
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                callback.onSuccess();
+                            } else {
+                                callback.onFailure(task.getException().getMessage());
+                            }
+                        });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onFailure(error.getMessage());
+            }
+        });
     }
 
     public interface StatusCallback {
@@ -305,6 +316,7 @@ public class FirebaseHelper {
         void onAdminChecked(boolean isAdmin);
         void onFailure(String errorMessage);
     }
+
     public void saveUserData(User user) {
         if (user != null && user.getId() != null) {
             Map<String, Object> updates = new HashMap<>();
@@ -328,7 +340,37 @@ public class FirebaseHelper {
                 .addOnFailureListener(e -> Toast.makeText(context, "Gagal simpan URL foto: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
+    public void saveProfileImageBase64(String uid, String base64Image) {
+        if (uid == null || base64Image == null || base64Image.isEmpty()) {
+            Toast.makeText(context, "UID atau gambar kosong", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        mDatabase.child("users").child(uid).child("profileBase64").setValue(base64Image)
+                .addOnSuccessListener(aVoid -> Toast.makeText(context, "Foto profil berhasil disimpan", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(context, "Gagal simpan foto profil: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
 
+    public void getFixedReportsByAdmin(String uid, ReportsCallback callback) {
+        mDatabase.child("reports")
+                .orderByChild("fixedBy")
+                .equalTo(uid)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        List<Report> result = new ArrayList<>();
+                        for (DataSnapshot child : snapshot.getChildren()) {
+                            Report report = child.getValue(Report.class);
+                            if (report != null && "fixed".equalsIgnoreCase(report.getStatus())) {
+                                result.add(report);
+                            }
+                        }
+                        callback.onReportsLoaded(result);
+                    }
 
-
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        callback.onCancelled(error.getMessage());
+                    }
+                });
+    }
 }

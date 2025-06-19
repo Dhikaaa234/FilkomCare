@@ -35,7 +35,7 @@ public class SearchActivity extends AppCompatActivity {
         searchResultsRecyclerView = findViewById(R.id.recyclerViewNews);
         firebaseHelper = new FirebaseHelper(this);
 
-        // Set up RecyclerView
+
         searchResultsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         reportAdapter = new ReportAdapter(this, new ReportAdapter.OnItemClickListener() {
             @Override
@@ -62,7 +62,7 @@ public class SearchActivity extends AppCompatActivity {
         });
         searchResultsRecyclerView.setAdapter(reportAdapter);
 
-        // Search functionality
+
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -92,13 +92,13 @@ public class SearchActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {}
         });
 
-        // Clear search icon click
+
         clearSearchIcon.setOnClickListener(v -> searchEditText.setText(""));
 
-        // Back button
+
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
-        // Navigation buttons
+
         findViewById(R.id.btnHome).setOnClickListener(v -> {
             startActivity(new Intent(SearchActivity.this, DashboardActivity.class));
             finish();

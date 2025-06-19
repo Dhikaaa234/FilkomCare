@@ -16,7 +16,7 @@ public class Report {
     private int likes;
     private Map<String, Boolean> likedBy;
 
-    // Constructors, getters, and setters
+
     public Report() {}
 
     public Report(String title, String location, String description, String image,
@@ -33,7 +33,7 @@ public class Report {
         this.likedBy = new HashMap<>();
     }
 
-    // Getters and setters for all fields
+
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     public String getTitle() { return title; }

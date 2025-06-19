@@ -31,7 +31,7 @@ public class NotificationActivity extends AppCompatActivity {
         notificationsRecyclerView = findViewById(R.id.recyclerViewNotifikasi);
         firebaseHelper = new FirebaseHelper(this);
 
-        // Set up RecyclerView
+
         notificationsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         notificationAdapter = new NotificationAdapter(this, new NotificationAdapter.OnItemClickListener() {
             @Override
@@ -45,12 +45,12 @@ public class NotificationActivity extends AppCompatActivity {
 
             @Override
             public void onDeleteClick(Notification notification) {
-                firebaseHelper.getDatabase().child("notifications").child(notification.getId()).removeValue(); // ✅ FIXED
+                firebaseHelper.getDatabase().child("notifications").child(notification.getId()).removeValue();
             }
         });
         notificationsRecyclerView.setAdapter(notificationAdapter);
 
-        // Load notifications
+
         FirebaseUser currentUser = firebaseHelper.getCurrentUser(); // ✅ FIXED
         if (currentUser != null) {
             firebaseHelper.getDatabase().child("notifications")
@@ -75,10 +75,10 @@ public class NotificationActivity extends AppCompatActivity {
                     });
         }
 
-        // Back button
+
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
-        // Navigation buttons
+
         findViewById(R.id.btnHome).setOnClickListener(v -> {
             startActivity(new Intent(NotificationActivity.this, DashboardActivity.class));
             finish();

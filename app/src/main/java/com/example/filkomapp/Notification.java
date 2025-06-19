@@ -9,10 +9,9 @@ public class Notification {
     private String userId;
     private boolean isRead;
 
-    // Constructor kosong (wajib untuk Firebase)
+
     public Notification() {}
 
-    // Constructor lengkap (sesuai pemanggilan di UploadActivity)
     public Notification(String id, String title, String message, String reportId, String userId, long timestamp, boolean isRead) {
         this.id = id;
         this.title = title;
@@ -23,7 +22,7 @@ public class Notification {
         this.isRead = isRead;
     }
 
-    // Getter dan Setter
+
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 

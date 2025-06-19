@@ -19,6 +19,7 @@ public class DashboardActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private ReportAdapter reportAdapter;
     private FirebaseHelper firebaseHelper;
+    private View btnKirim;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,9 +29,10 @@ public class DashboardActivity extends AppCompatActivity {
         greetingText = findViewById(R.id.greeting_text);
         nameText = findViewById(R.id.name_text);
         recyclerView = findViewById(R.id.recyclerViewNews);
+        btnKirim = findViewById(R.id.btnKirim);
         firebaseHelper = new FirebaseHelper(this);
 
-        // Set up RecyclerView
+        // Setup RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         reportAdapter = new ReportAdapter(this, new ReportAdapter.OnItemClickListener() {
             @Override
@@ -44,32 +46,48 @@ public class DashboardActivity extends AppCompatActivity {
             public void onLikeClick(Report report, boolean isLiked) {
                 FirebaseUser user = firebaseHelper.getCurrentUser();
                 if (user != null) {
-                    firebaseHelper.toggleLikeReport(report.getId(),
-                            user.getUid(),
-                            new FirebaseHelper.LikeCallback() {
-                                @Override
-                                public void onSuccess(boolean isLiked) {
-                                    // Optional: update UI
-                                }
+                    firebaseHelper.toggleLikeReport(report.getId(), user.getUid(), new FirebaseHelper.LikeCallback() {
+                        @Override
+                        public void onSuccess(boolean isLiked) {
+                            // Optional: update UI
+                        }
 
-                                @Override
-                                public void onFailure(String errorMessage) {
-                                    Toast.makeText(DashboardActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                        @Override
+                        public void onFailure(String errorMessage) {
+                            Toast.makeText(DashboardActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         });
         recyclerView.setAdapter(reportAdapter);
 
-        // Load user data
+        // Load user data & check admin status
         FirebaseUser currentUser = firebaseHelper.getCurrentUser();
         if (currentUser != null) {
-            firebaseHelper.getUserData(currentUser.getUid(), new FirebaseHelper.UserCallback() {
+            String uid = currentUser.getUid();
+
+            // Load name
+            firebaseHelper.getUserData(uid, new FirebaseHelper.UserCallback() {
                 @Override
                 public void onUserLoaded(User user) {
                     greetingText.setText("Halo,");
                     nameText.setText(user.getName());
+                }
+
+                @Override
+                public void onFailure(String errorMessage) {
+                    Toast.makeText(DashboardActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            // Hide upload button if user is admin
+            firebaseHelper.checkAdminStatus(uid, new FirebaseHelper.AdminCheckCallback() {
+                @Override
+                public void onAdminChecked(boolean isAdmin) {
+                    if (isAdmin) {
+                        btnKirim.setVisibility(View.GONE); // Sembunyikan tombol kirim jika admin
+                    }
                 }
 
                 @Override
@@ -92,7 +110,7 @@ public class DashboardActivity extends AppCompatActivity {
             }
         });
 
-        // Tombol Navigasi
+        // Navigation Buttons
         findViewById(R.id.btnHome).setOnClickListener(v -> {
             firebaseHelper.getAllReports(new FirebaseHelper.ReportsCallback() {
                 @Override
@@ -116,25 +134,24 @@ public class DashboardActivity extends AppCompatActivity {
         findViewById(R.id.notification_icon).setOnClickListener(v ->
                 startActivity(new Intent(DashboardActivity.this, NotificationActivity.class)));
 
-        findViewById(R.id.btnKirim).setOnClickListener(v -> {
-            FirebaseUser currentUserKirim = firebaseHelper.getCurrentUser();
-            if (currentUserKirim != null) {
-                firebaseHelper.checkAdminStatus(currentUserKirim.getUid(),
-                        new FirebaseHelper.AdminCheckCallback() {
-                            @Override
-                            public void onAdminChecked(boolean isAdmin) {
-                                if (!isAdmin) {
-                                    startActivity(new Intent(DashboardActivity.this, UploadActivity.class));
-                                } else {
-                                    Toast.makeText(DashboardActivity.this, "Admin tidak bisa mengirim laporan", Toast.LENGTH_SHORT).show();
-                                }
-                            }
+        btnKirim.setOnClickListener(v -> {
+            FirebaseUser user = firebaseHelper.getCurrentUser();
+            if (user != null) {
+                firebaseHelper.checkAdminStatus(user.getUid(), new FirebaseHelper.AdminCheckCallback() {
+                    @Override
+                    public void onAdminChecked(boolean isAdmin) {
+                        if (!isAdmin) {
+                            startActivity(new Intent(DashboardActivity.this, UploadActivity.class));
+                        } else {
+                            Toast.makeText(DashboardActivity.this, "Admin tidak bisa mengirim laporan", Toast.LENGTH_SHORT).show();
+                        }
+                    }
 
-                            @Override
-                            public void onFailure(String errorMessage) {
-                                Toast.makeText(DashboardActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                    @Override
+                    public void onFailure(String errorMessage) {
+                        Toast.makeText(DashboardActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }
