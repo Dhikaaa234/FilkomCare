@@ -50,7 +50,7 @@ public class SearchActivity extends AppCompatActivity {
                 firebaseHelper.toggleLikeReport(report.getId(), firebaseHelper.getCurrentUser().getUid(), new FirebaseHelper.LikeCallback() {
                     @Override
                     public void onSuccess(boolean isLiked) {
-                        // Optional: handle UI update
+
                     }
 
                     @Override

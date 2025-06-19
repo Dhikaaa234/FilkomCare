@@ -28,19 +28,18 @@ public class SignUpActivity extends AppCompatActivity {
         emailField = findViewById(R.id.gmailfield);
         passwordField = findViewById(R.id.passfield);
         confirmPasswordField = findViewById(R.id.passfield2);
-        togglePassword1 = findViewById(R.id.imageView5);   // 👁️ untuk password utama
-        togglePassword2 = findViewById(R.id.imageView10);  // 👁️ untuk konfirmasi password
-
+        togglePassword1 = findViewById(R.id.imageView5);
+        togglePassword2 = findViewById(R.id.imageView10);
         firebaseHelper = new FirebaseHelper(this);
 
 
         togglePassword1.setOnClickListener(v -> {
             if (isPasswordVisible1) {
                 passwordField.setTransformationMethod(new PasswordTransformationMethod());
-                togglePassword1.setImageResource(R.drawable.eye_icon); // mata tertutup
+                togglePassword1.setImageResource(R.drawable.eye_icon);
             } else {
                 passwordField.setTransformationMethod(null);
-                togglePassword1.setImageResource(R.drawable.eye_icon); // mata terbuka (kalau punya icon khusus, ganti di sini)
+                togglePassword1.setImageResource(R.drawable.eye_icon);
             }
             isPasswordVisible1 = !isPasswordVisible1;
             passwordField.setSelection(passwordField.getText().length());

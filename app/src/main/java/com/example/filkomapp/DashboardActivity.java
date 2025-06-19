@@ -49,7 +49,7 @@ public class DashboardActivity extends AppCompatActivity {
                     firebaseHelper.toggleLikeReport(report.getId(), user.getUid(), new FirebaseHelper.LikeCallback() {
                         @Override
                         public void onSuccess(boolean isLiked) {
-                            // Optional: update UI
+
                         }
 
                         @Override
@@ -62,12 +62,12 @@ public class DashboardActivity extends AppCompatActivity {
         });
         recyclerView.setAdapter(reportAdapter);
 
-        // Load user data & check admin status
+
         FirebaseUser currentUser = firebaseHelper.getCurrentUser();
         if (currentUser != null) {
             String uid = currentUser.getUid();
 
-            // Load name
+
             firebaseHelper.getUserData(uid, new FirebaseHelper.UserCallback() {
                 @Override
                 public void onUserLoaded(User user) {
@@ -81,12 +81,12 @@ public class DashboardActivity extends AppCompatActivity {
                 }
             });
 
-            // Hide upload button if user is admin
+
             firebaseHelper.checkAdminStatus(uid, new FirebaseHelper.AdminCheckCallback() {
                 @Override
                 public void onAdminChecked(boolean isAdmin) {
                     if (isAdmin) {
-                        btnKirim.setVisibility(View.GONE); // Sembunyikan tombol kirim jika admin
+                        btnKirim.setVisibility(View.GONE);
                     }
                 }
 
@@ -97,7 +97,7 @@ public class DashboardActivity extends AppCompatActivity {
             });
         }
 
-        // Load reports
+
         firebaseHelper.getAllReports(new FirebaseHelper.ReportsCallback() {
             @Override
             public void onReportsLoaded(List<Report> reports) {
@@ -110,7 +110,7 @@ public class DashboardActivity extends AppCompatActivity {
             }
         });
 
-        // Navigation Buttons
+
         findViewById(R.id.btnHome).setOnClickListener(v -> {
             firebaseHelper.getAllReports(new FirebaseHelper.ReportsCallback() {
                 @Override

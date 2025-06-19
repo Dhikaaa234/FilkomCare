@@ -124,14 +124,14 @@ public class ReportDetailActivity extends AppCompatActivity {
 
                 String selectedStatus = adapterView.getItemAtPosition(position).toString();
 
-                // Jika admin memilih "Fixed", konfirmasi dulu
+
                 if (selectedStatus.equalsIgnoreCase("fixed")) {
                     new AlertDialog.Builder(ReportDetailActivity.this)
                             .setTitle("Konfirmasi Status")
                             .setMessage("Setelah status diubah menjadi 'Fixed', status tidak bisa diubah lagi. Lanjutkan?")
                             .setPositiveButton("Ya", (dialog, which) -> updateStatus(selectedStatus))
                             .setNegativeButton("Batal", (dialog, which) -> {
-                                // Kembalikan ke pilihan sebelumnya (supaya tidak langsung berubah)
+
                                 statusSpinner.setSelection(getSpinnerIndexByStatus(statusText.getText().toString()));
                             })
                             .setCancelable(false)

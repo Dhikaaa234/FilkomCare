@@ -51,7 +51,7 @@ public class NotificationActivity extends AppCompatActivity {
         notificationsRecyclerView.setAdapter(notificationAdapter);
 
 
-        FirebaseUser currentUser = firebaseHelper.getCurrentUser(); // ✅ FIXED
+        FirebaseUser currentUser = firebaseHelper.getCurrentUser();
         if (currentUser != null) {
             firebaseHelper.getDatabase().child("notifications")
                     .orderByChild("userId")
@@ -89,7 +89,7 @@ public class NotificationActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.btnKirim).setOnClickListener(v -> {
-            FirebaseUser user = firebaseHelper.getCurrentUser(); // ✅ FIXED
+            FirebaseUser user = firebaseHelper.getCurrentUser();
             if (user != null) {
                 firebaseHelper.checkAdminStatus(user.getUid(), new FirebaseHelper.AdminCheckCallback() {
                     @Override

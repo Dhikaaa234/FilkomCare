@@ -35,7 +35,7 @@ public class UploadActivity extends AppCompatActivity {
         uploadImageView = findViewById(R.id.uploadImageView);
         firebaseHelper = new FirebaseHelper(this);
 
-        // Klik upload gambar
+
         uploadImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -43,7 +43,7 @@ public class UploadActivity extends AppCompatActivity {
             }
         });
 
-        // Tombol Kirim
+
         findViewById(R.id.btnKirim).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -51,7 +51,7 @@ public class UploadActivity extends AppCompatActivity {
             }
         });
 
-        // Tombol Back
+
         findViewById(R.id.btnBack).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
