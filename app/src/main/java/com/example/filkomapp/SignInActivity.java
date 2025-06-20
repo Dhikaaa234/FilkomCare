@@ -38,6 +38,12 @@ public class SignInActivity extends AppCompatActivity {
         passwordToggle = findViewById(R.id.imageView5);
         firebaseHelper = new FirebaseHelper(this);
 
+        //ke signup
+        ImageButton imageView6 = findViewById(R.id.imageView6);
+        imageView6.setOnClickListener(v -> {
+            startActivity(new Intent(SignInActivity.this, SignUpActivity.class));
+        });
+
         // Tombol login
         ImageButton loginButton = findViewById(R.id.button);
         loginButton.setOnClickListener(v -> {
