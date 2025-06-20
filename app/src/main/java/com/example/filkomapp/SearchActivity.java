@@ -24,6 +24,7 @@ public class SearchActivity extends AppCompatActivity {
     private RecyclerView searchResultsRecyclerView;
     private ReportAdapter reportAdapter;
     private FirebaseHelper firebaseHelper;
+    private View btnKirim;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +34,8 @@ public class SearchActivity extends AppCompatActivity {
         searchEditText = findViewById(R.id.editJudul);
         clearSearchIcon = findViewById(R.id.deleteIcon);
         searchResultsRecyclerView = findViewById(R.id.recyclerViewNews);
+        btnKirim = findViewById(R.id.btnKirim);
         firebaseHelper = new FirebaseHelper(this);
-
 
         searchResultsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         reportAdapter = new ReportAdapter(this, new ReportAdapter.OnItemClickListener() {
@@ -49,9 +50,7 @@ public class SearchActivity extends AppCompatActivity {
             public void onLikeClick(Report report, boolean isLiked) {
                 firebaseHelper.toggleLikeReport(report.getId(), firebaseHelper.getCurrentUser().getUid(), new FirebaseHelper.LikeCallback() {
                     @Override
-                    public void onSuccess(boolean isLiked) {
-
-                    }
+                    public void onSuccess(boolean isLiked) {}
 
                     @Override
                     public void onFailure(String errorMessage) {
@@ -61,7 +60,6 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
         searchResultsRecyclerView.setAdapter(reportAdapter);
-
 
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -92,41 +90,35 @@ public class SearchActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {}
         });
 
-
         clearSearchIcon.setOnClickListener(v -> searchEditText.setText(""));
-
-
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
-
-
         findViewById(R.id.btnHome).setOnClickListener(v -> {
             startActivity(new Intent(SearchActivity.this, DashboardActivity.class));
             finish();
         });
-
         findViewById(R.id.btnProfile).setOnClickListener(v -> {
             startActivity(new Intent(SearchActivity.this, ProfileActivity.class));
         });
 
-        findViewById(R.id.btnKirim).setOnClickListener(v -> {
-            FirebaseUser currentUser = firebaseHelper.getCurrentUser();
-            if (currentUser != null) {
-                firebaseHelper.checkAdminStatus(currentUser.getUid(), new FirebaseHelper.AdminCheckCallback() {
-                    @Override
-                    public void onAdminChecked(boolean isAdmin) {
-                        if (!isAdmin) {
+        FirebaseUser currentUser = firebaseHelper.getCurrentUser();
+        if (currentUser != null) {
+            firebaseHelper.checkAdminStatus(currentUser.getUid(), new FirebaseHelper.AdminCheckCallback() {
+                @Override
+                public void onAdminChecked(boolean isAdmin) {
+                    if (isAdmin) {
+                        btnKirim.setVisibility(View.GONE);
+                    } else {
+                        btnKirim.setOnClickListener(v -> {
                             startActivity(new Intent(SearchActivity.this, UploadActivity.class));
-                        } else {
-                            Toast.makeText(SearchActivity.this, "Admin tidak bisa mengirim laporan", Toast.LENGTH_SHORT).show();
-                        }
+                        });
                     }
+                }
 
-                    @Override
-                    public void onFailure(String errorMessage) {
-                        Toast.makeText(SearchActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
+                @Override
+                public void onFailure(String errorMessage) {
+                    Toast.makeText(SearchActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 }

@@ -22,6 +22,7 @@ public class NotificationActivity extends AppCompatActivity {
     private RecyclerView notificationsRecyclerView;
     private NotificationAdapter notificationAdapter;
     private FirebaseHelper firebaseHelper;
+    private View btnKirim;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +30,8 @@ public class NotificationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notifikasi);
 
         notificationsRecyclerView = findViewById(R.id.recyclerViewNotifikasi);
+        btnKirim = findViewById(R.id.btnKirim);
         firebaseHelper = new FirebaseHelper(this);
-
 
         notificationsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         notificationAdapter = new NotificationAdapter(this, new NotificationAdapter.OnItemClickListener() {
@@ -49,7 +50,6 @@ public class NotificationActivity extends AppCompatActivity {
             }
         });
         notificationsRecyclerView.setAdapter(notificationAdapter);
-
 
         FirebaseUser currentUser = firebaseHelper.getCurrentUser();
         if (currentUser != null) {
@@ -73,11 +73,27 @@ public class NotificationActivity extends AppCompatActivity {
                             Toast.makeText(NotificationActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
+
+            firebaseHelper.checkAdminStatus(currentUser.getUid(), new FirebaseHelper.AdminCheckCallback() {
+                @Override
+                public void onAdminChecked(boolean isAdmin) {
+                    if (isAdmin) {
+                        btnKirim.setVisibility(View.GONE);
+                    } else {
+                        btnKirim.setOnClickListener(v -> {
+                            startActivity(new Intent(NotificationActivity.this, UploadActivity.class));
+                        });
+                    }
+                }
+
+                @Override
+                public void onFailure(String errorMessage) {
+                    Toast.makeText(NotificationActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
-
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
-
 
         findViewById(R.id.btnHome).setOnClickListener(v -> {
             startActivity(new Intent(NotificationActivity.this, DashboardActivity.class));
@@ -86,27 +102,6 @@ public class NotificationActivity extends AppCompatActivity {
 
         findViewById(R.id.btnProfile).setOnClickListener(v -> {
             startActivity(new Intent(NotificationActivity.this, ProfileActivity.class));
-        });
-
-        findViewById(R.id.btnKirim).setOnClickListener(v -> {
-            FirebaseUser user = firebaseHelper.getCurrentUser();
-            if (user != null) {
-                firebaseHelper.checkAdminStatus(user.getUid(), new FirebaseHelper.AdminCheckCallback() {
-                    @Override
-                    public void onAdminChecked(boolean isAdmin) {
-                        if (!isAdmin) {
-                            startActivity(new Intent(NotificationActivity.this, UploadActivity.class));
-                        } else {
-                            Toast.makeText(NotificationActivity.this, "Admin tidak bisa mengirim laporan", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(String errorMessage) {
-                        Toast.makeText(NotificationActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
         });
     }
 }
