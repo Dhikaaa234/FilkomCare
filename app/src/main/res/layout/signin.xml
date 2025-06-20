@@ -5,17 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
     <ImageView
         android:id="@+id/signupback"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:scaleX="1.03"
-        android:scrollbarAlwaysDrawVerticalTrack="false"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.444"
-        app:layout_constraintStart_toStartOf="parent"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/top_banner" />
 
     <TextView
@@ -140,10 +138,10 @@
         app:layout_constraintTop_toTopOf="@+id/button" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/textdaftar"
         android:layout_width="300dp"
         android:layout_height="98dp"
-        android:gravity="center_vertical"
+        android:gravity="center"
         android:text="@string/sign_account"
         android:textAlignment="center"
         android:textSize="10dp"

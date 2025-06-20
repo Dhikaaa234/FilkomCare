@@ -3,21 +3,19 @@ package com.example.filkomapp;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.view.View;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Base64;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,6 +28,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -53,6 +53,7 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
         historyTitle = findViewById(R.id.historyTitle);
         nameText = findViewById(R.id.name);
         statusText = findViewById(R.id.status);
@@ -62,10 +63,8 @@ public class ProfileActivity extends AppCompatActivity {
         reportsRecyclerView = findViewById(R.id.recyclerViewNews);
         profileImage = findViewById(R.id.profileIcon);
         btnKirim = findViewById(R.id.btnKirim);
-
         fixedHistoryTitle = findViewById(R.id.fixedHistoryTitle);
         fixedReportsRecyclerView = findViewById(R.id.fixedReportsRecyclerView);
-
         firebaseHelper = new FirebaseHelper(this);
 
         reportsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -133,17 +132,11 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-        profileImage.setOnClickListener(v -> {
-
-        });
-
         profileImage.setOnLongClickListener(v -> {
             new android.app.AlertDialog.Builder(ProfileActivity.this)
                     .setTitle("Ganti Foto Profil")
                     .setMessage("Apakah Anda ingin mengganti foto profil?")
-                    .setPositiveButton("Ya", (dialog, which) -> {
-                        checkPermissionAndSelectImage();
-                    })
+                    .setPositiveButton("Ya", (dialog, which) -> checkPermissionAndSelectImage())
                     .setNegativeButton("Tidak", null)
                     .show();
             return true;
@@ -164,7 +157,10 @@ public class ProfileActivity extends AppCompatActivity {
                 if (user.getProfileBase64() != null && !user.getProfileBase64().isEmpty()) {
                     byte[] decodedString = Base64.decode(user.getProfileBase64(), Base64.DEFAULT);
                     Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                    profileImage.setImageBitmap(decodedByte);
+                    Glide.with(ProfileActivity.this)
+                            .load(decodedByte)
+                            .circleCrop()
+                            .into(profileImage);
                 }
 
                 firebaseHelper.checkAdminStatus(uid, new FirebaseHelper.AdminCheckCallback() {
@@ -178,9 +174,13 @@ public class ProfileActivity extends AppCompatActivity {
                             fixedReportsRecyclerView.setVisibility(View.VISIBLE);
                             reportsRecyclerView.setVisibility(View.GONE);
                             historyTitle.setVisibility(View.GONE);
+
                             firebaseHelper.getFixedReportsByAdmin(uid, new FirebaseHelper.ReportsCallback() {
                                 @Override
                                 public void onReportsLoaded(List<Report> reports) {
+                                    for (Report r : reports) {
+                                        if (r.getId() == null) r.setId(r.getUserId());
+                                    }
                                     fixedReportAdapter.setReports(reports);
                                 }
 
@@ -209,35 +209,12 @@ public class ProfileActivity extends AppCompatActivity {
                                 prodiSaved = true;
                             }
 
-                            nimText.setOnFocusChangeListener((v, hasFocus) -> {
-                                if (!hasFocus && !nimSaved) {
-                                    String nimBaru = nimText.getText().toString().trim();
-                                    if (!nimBaru.isEmpty()) {
-                                        user.setNim(nimBaru);
-                                        firebaseHelper.saveUserData(user);
-                                        nimText.setEnabled(false);
-                                        nimSaved = true;
-                                        Toast.makeText(ProfileActivity.this, "NIM disimpan", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
-
-                            prodiText.setOnFocusChangeListener((v, hasFocus) -> {
-                                if (!hasFocus && !prodiSaved) {
-                                    String prodiBaru = prodiText.getText().toString().trim();
-                                    if (!prodiBaru.isEmpty()) {
-                                        user.setProgramStudi(prodiBaru);
-                                        firebaseHelper.saveUserData(user);
-                                        prodiText.setEnabled(false);
-                                        prodiSaved = true;
-                                        Toast.makeText(ProfileActivity.this, "Program Studi disimpan", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
-
                             firebaseHelper.getReportsByUser(uid, new FirebaseHelper.ReportsCallback() {
                                 @Override
                                 public void onReportsLoaded(List<Report> reports) {
+                                    for (Report r : reports) {
+                                        if (r.getId() == null) r.setId(r.getUserId());
+                                    }
                                     reportAdapter.setReports(reports);
                                 }
 
@@ -290,28 +267,28 @@ public class ProfileActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             imageUri = data.getData();
-            profileImage.setImageURI(imageUri);
-            uploadProfileImage(imageUri);
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                Glide.with(this).load(bitmap).circleCrop().into(profileImage);
+                uploadProfileImage(bitmap);
+            } catch (IOException e) {
+                Toast.makeText(this, "Gagal memuat gambar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
-    private void uploadProfileImage(Uri uri) {
-        try {
-            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
-            byte[] imageBytes = baos.toByteArray();
-            String base64Image = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+    private void uploadProfileImage(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String base64Image = Base64.encodeToString(imageBytes, Base64.DEFAULT);
 
-            FirebaseUser user = firebaseHelper.getCurrentUser();
-            if (user != null) {
-                firebaseHelper.saveProfileImageBase64(user.getUid(), base64Image);
-                Toast.makeText(this, "Foto berhasil disimpan", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "User tidak ditemukan", Toast.LENGTH_SHORT).show();
-            }
-        } catch (IOException e) {
-            Toast.makeText(this, "Gagal konversi gambar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        FirebaseUser user = firebaseHelper.getCurrentUser();
+        if (user != null) {
+            firebaseHelper.saveProfileImageBase64(user.getUid(), base64Image);
+            Toast.makeText(this, "Foto berhasil disimpan", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "User tidak ditemukan", Toast.LENGTH_SHORT).show();
         }
     }
 

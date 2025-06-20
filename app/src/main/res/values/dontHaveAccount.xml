@@ -1,5 +1,3 @@
 <resources>
-    <string name="sign_account">
-           Tidak memiliki akun? <b>Daftar</b>
-    </string>
+    <string name="sign_account">Tidak memiliki akun? Daftar</string>
 </resources>

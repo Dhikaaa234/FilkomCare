@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
@@ -78,11 +79,13 @@ public class DashboardActivity extends AppCompatActivity {
                     greetingText.setText("Halo,");
                     nameText.setText(user.getName());
 
-
                     if (user.getProfileBase64() != null && !user.getProfileBase64().isEmpty()) {
                         byte[] decodedString = Base64.decode(user.getProfileBase64(), Base64.DEFAULT);
                         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                        profileIcon.setImageBitmap(decodedByte);
+                        Glide.with(DashboardActivity.this)
+                                .load(decodedByte)
+                                .circleCrop()
+                                .into(profileIcon);
                     }
                 }
 
