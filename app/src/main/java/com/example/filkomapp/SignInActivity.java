@@ -8,7 +8,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ImageButton;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.auth.FirebaseUser;
 
 public class SignInActivity extends AppCompatActivity {
@@ -27,6 +29,9 @@ public class SignInActivity extends AppCompatActivity {
         passwordField = findViewById(R.id.passfield);
         passwordToggle = findViewById(R.id.imageView5);
         firebaseHelper = new FirebaseHelper(this);
+
+
+        passwordField.setTransformationMethod(new PasswordTransformationMethod());
 
 
         passwordToggle.setOnClickListener(v -> {
@@ -64,7 +69,6 @@ public class SignInActivity extends AppCompatActivity {
                 }
             });
         });
-
 
         ImageButton switchToSignup = findViewById(R.id.imageView6);
         switchToSignup.setOnClickListener(v -> {

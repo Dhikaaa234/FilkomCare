@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.view.View;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Base64;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -79,9 +80,7 @@ public class ProfileActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onLikeClick(Report report, boolean isLiked) {
-                // No-op in profile screen
-            }
+            public void onLikeClick(Report report, boolean isLiked) {}
         });
         reportsRecyclerView.setAdapter(reportAdapter);
 
@@ -94,9 +93,7 @@ public class ProfileActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onLikeClick(Report report, boolean isLiked) {
-                // No-op in profile screen
-            }
+            public void onLikeClick(Report report, boolean isLiked) {}
         });
         fixedReportsRecyclerView.setAdapter(fixedReportAdapter);
 
@@ -136,7 +133,21 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-        profileImage.setOnClickListener(v -> checkPermissionAndSelectImage());
+        profileImage.setOnClickListener(v -> {
+
+        });
+
+        profileImage.setOnLongClickListener(v -> {
+            new android.app.AlertDialog.Builder(ProfileActivity.this)
+                    .setTitle("Ganti Foto Profil")
+                    .setMessage("Apakah Anda ingin mengganti foto profil?")
+                    .setPositiveButton("Ya", (dialog, which) -> {
+                        checkPermissionAndSelectImage();
+                    })
+                    .setNegativeButton("Tidak", null)
+                    .show();
+            return true;
+        });
     }
 
     private void loadUserData() {
@@ -150,10 +161,11 @@ public class ProfileActivity extends AppCompatActivity {
             public void onUserLoaded(User user) {
                 nameText.setText(user.getName());
 
-                Glide.with(ProfileActivity.this)
-                        .load(user.getProfileUrl())
-                        .placeholder(R.drawable.profile)
-                        .into(profileImage);
+                if (user.getProfileBase64() != null && !user.getProfileBase64().isEmpty()) {
+                    byte[] decodedString = Base64.decode(user.getProfileBase64(), Base64.DEFAULT);
+                    Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                    profileImage.setImageBitmap(decodedByte);
+                }
 
                 firebaseHelper.checkAdminStatus(uid, new FirebaseHelper.AdminCheckCallback() {
                     @Override

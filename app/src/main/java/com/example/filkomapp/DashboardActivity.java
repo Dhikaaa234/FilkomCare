@@ -1,8 +1,12 @@
 package com.example.filkomapp;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +24,7 @@ public class DashboardActivity extends AppCompatActivity {
     private ReportAdapter reportAdapter;
     private FirebaseHelper firebaseHelper;
     private View btnKirim;
+    private ImageView profileIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,9 +35,10 @@ public class DashboardActivity extends AppCompatActivity {
         nameText = findViewById(R.id.name_text);
         recyclerView = findViewById(R.id.recyclerViewNews);
         btnKirim = findViewById(R.id.btnKirim);
+        profileIcon = findViewById(R.id.profile_icon);
         firebaseHelper = new FirebaseHelper(this);
 
-        // Setup RecyclerView
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         reportAdapter = new ReportAdapter(this, new ReportAdapter.OnItemClickListener() {
             @Override
@@ -62,17 +68,22 @@ public class DashboardActivity extends AppCompatActivity {
         });
         recyclerView.setAdapter(reportAdapter);
 
-
         FirebaseUser currentUser = firebaseHelper.getCurrentUser();
         if (currentUser != null) {
             String uid = currentUser.getUid();
-
 
             firebaseHelper.getUserData(uid, new FirebaseHelper.UserCallback() {
                 @Override
                 public void onUserLoaded(User user) {
                     greetingText.setText("Halo,");
                     nameText.setText(user.getName());
+
+
+                    if (user.getProfileBase64() != null && !user.getProfileBase64().isEmpty()) {
+                        byte[] decodedString = Base64.decode(user.getProfileBase64(), Base64.DEFAULT);
+                        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                        profileIcon.setImageBitmap(decodedByte);
+                    }
                 }
 
                 @Override
@@ -80,7 +91,6 @@ public class DashboardActivity extends AppCompatActivity {
                     Toast.makeText(DashboardActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
                 }
             });
-
 
             firebaseHelper.checkAdminStatus(uid, new FirebaseHelper.AdminCheckCallback() {
                 @Override
@@ -96,7 +106,6 @@ public class DashboardActivity extends AppCompatActivity {
                 }
             });
         }
-
 
         firebaseHelper.getAllReports(new FirebaseHelper.ReportsCallback() {
             @Override
@@ -153,6 +162,11 @@ public class DashboardActivity extends AppCompatActivity {
                     }
                 });
             }
+        });
+
+
+        profileIcon.setOnClickListener(v -> {
+            startActivity(new Intent(DashboardActivity.this, ProfileActivity.class));
         });
     }
 }

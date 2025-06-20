@@ -7,7 +7,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.auth.FirebaseUser;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -23,27 +25,31 @@ public class SignUpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signup);
 
-
         nameField = findViewById(R.id.namefield);
         emailField = findViewById(R.id.gmailfield);
         passwordField = findViewById(R.id.passfield);
         confirmPasswordField = findViewById(R.id.passfield2);
         togglePassword1 = findViewById(R.id.imageView5);
         togglePassword2 = findViewById(R.id.imageView10);
+
         firebaseHelper = new FirebaseHelper(this);
+
+
+        passwordField.setTransformationMethod(new PasswordTransformationMethod());
+        confirmPasswordField.setTransformationMethod(new PasswordTransformationMethod());
 
 
         togglePassword1.setOnClickListener(v -> {
             if (isPasswordVisible1) {
                 passwordField.setTransformationMethod(new PasswordTransformationMethod());
                 togglePassword1.setImageResource(R.drawable.eye_icon);
-            } else {
                 passwordField.setTransformationMethod(null);
                 togglePassword1.setImageResource(R.drawable.eye_icon);
             }
             isPasswordVisible1 = !isPasswordVisible1;
             passwordField.setSelection(passwordField.getText().length());
         });
+
 
         togglePassword2.setOnClickListener(v -> {
             if (isPasswordVisible2) {

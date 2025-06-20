@@ -55,7 +55,7 @@
         android:layout_marginTop="16dp"
         android:background="@drawable/textfield"
         android:ems="10"
-        android:inputType="text"
+        android:inputType="textPassword"
         android:paddingStart="64dp"
         android:paddingEnd="45dp"
         android:hint="Password"
