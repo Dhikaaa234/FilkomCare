@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity {
+
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int PERMISSION_REQUEST_READ_EXTERNAL_STORAGE = 100;
 
@@ -65,6 +66,7 @@ public class ProfileActivity extends AppCompatActivity {
         btnKirim = findViewById(R.id.btnKirim);
         fixedHistoryTitle = findViewById(R.id.fixedHistoryTitle);
         fixedReportsRecyclerView = findViewById(R.id.fixedReportsRecyclerView);
+
         firebaseHelper = new FirebaseHelper(this);
 
         reportsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -105,10 +107,12 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
         findViewById(R.id.btnHome).setOnClickListener(v -> {
             startActivity(new Intent(ProfileActivity.this, DashboardActivity.class));
             finish();
         });
+
         findViewById(R.id.btnProfile).setOnClickListener(v -> {});
 
         btnKirim.setOnClickListener(v -> {
@@ -157,10 +161,7 @@ public class ProfileActivity extends AppCompatActivity {
                 if (user.getProfileBase64() != null && !user.getProfileBase64().isEmpty()) {
                     byte[] decodedString = Base64.decode(user.getProfileBase64(), Base64.DEFAULT);
                     Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                    Glide.with(ProfileActivity.this)
-                            .load(decodedByte)
-                            .circleCrop()
-                            .into(profileImage);
+                    Glide.with(ProfileActivity.this).load(decodedByte).circleCrop().into(profileImage);
                 }
 
                 firebaseHelper.checkAdminStatus(uid, new FirebaseHelper.AdminCheckCallback() {
@@ -178,9 +179,6 @@ public class ProfileActivity extends AppCompatActivity {
                             firebaseHelper.getFixedReportsByAdmin(uid, new FirebaseHelper.ReportsCallback() {
                                 @Override
                                 public void onReportsLoaded(List<Report> reports) {
-                                    for (Report r : reports) {
-                                        if (r.getId() == null) r.setId(r.getUserId());
-                                    }
                                     fixedReportAdapter.setReports(reports);
                                 }
 
@@ -209,12 +207,35 @@ public class ProfileActivity extends AppCompatActivity {
                                 prodiSaved = true;
                             }
 
+                            nimText.setOnFocusChangeListener((v, hasFocus) -> {
+                                if (!hasFocus && !nimSaved) {
+                                    String nimBaru = nimText.getText().toString().trim();
+                                    if (!nimBaru.isEmpty()) {
+                                        user.setNim(nimBaru);
+                                        firebaseHelper.saveUserData(user);
+                                        nimText.setEnabled(false);
+                                        nimSaved = true;
+                                        Toast.makeText(ProfileActivity.this, "NIM disimpan", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+
+                            prodiText.setOnFocusChangeListener((v, hasFocus) -> {
+                                if (!hasFocus && !prodiSaved) {
+                                    String prodiBaru = prodiText.getText().toString().trim();
+                                    if (!prodiBaru.isEmpty()) {
+                                        user.setProgramStudi(prodiBaru);
+                                        firebaseHelper.saveUserData(user);
+                                        prodiText.setEnabled(false);
+                                        prodiSaved = true;
+                                        Toast.makeText(ProfileActivity.this, "Program Studi disimpan", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+
                             firebaseHelper.getReportsByUser(uid, new FirebaseHelper.ReportsCallback() {
                                 @Override
                                 public void onReportsLoaded(List<Report> reports) {
-                                    for (Report r : reports) {
-                                        if (r.getId() == null) r.setId(r.getUserId());
-                                    }
                                     reportAdapter.setReports(reports);
                                 }
 
